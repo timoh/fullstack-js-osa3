@@ -3,35 +3,21 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
+const mongoose = require('mongoose')
+require('dotenv').config()
 
+const url = process.env.MONGODB_URI
 
 app.use(express.static('build'))
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
 app.use(cors())
 
-let persons = [
-  {
-    name: "Arto Hellas",
-    number: "040123123",
-    id: 1
-  }, 
-  {
-    name: "Martti Tienari",
-    number: "040-123456",
-    id: 2
-  }, 
-  {
-    name: "Arto Järvinen",
-    number: "040123563",
-    id: 3
-  },
-  {
-    name: "Lea Kutvonen",
-    number: "0401242323",
-    id: 4
-  }
-]
+const Person = mongoose.model('Person', {
+  name: String,
+  number: String,
+  id: Number
+})
 
 app.get('/api/persons', (req, res) => {
   res.json(persons)
@@ -51,11 +37,20 @@ app.post('/api/persons', (req, res) => {
   const newId = genId()
   // console.log("New ID is: ", newId)
 
-  const person = {
+  mongoose.connect(url)
+
+  const person = new Person{
     name: req.body.name,
     number: req.body.number,
     id: newId
   }
+
+  person.save().then(resp => {
+    console.log(`Saved person with ID ${newId}`)
+    mongoose.connection.close()
+  })
+
+
 
   // console.log("Persons array before:", persons)
   // console.log("Created person:", person)

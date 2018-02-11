@@ -7,3 +7,7 @@ npm run start
 
 npm run watch
 > for development with nodemon autoreload
+
+## Deployed demo
+
+https://thpuhlo-fullstack-osa3.herokuapp.com

@@ -1,7 +1,9 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+const morgan = require('morgan')
 app.use(bodyParser.json())
+app.use(morgan('tiny'))
 
 
 let persons = [
@@ -43,7 +45,7 @@ app.post('/api/persons', (req, res) => {
   }
 
   const newId = genId()
-  console.log("New ID is: ", newId)
+  // console.log("New ID is: ", newId)
 
   const person = {
     name: req.body.name,
@@ -51,10 +53,10 @@ app.post('/api/persons', (req, res) => {
     id: newId
   }
 
-  console.log("Persons array before:", persons)
-  console.log("Created person:", person)
+  // console.log("Persons array before:", persons)
+  // console.log("Created person:", person)
   persons[persons.length] = person
-  console.log("Persons array after:", persons)
+  // console.log("Persons array after:", persons)
   
   res.json(person)
 })

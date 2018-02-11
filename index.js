@@ -1,5 +1,8 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
+app.use(bodyParser.json())
+
 
 let persons = [
   {
@@ -24,9 +27,36 @@ let persons = [
   }
 ]
 
-
 app.get('/api/persons', (req, res) => {
   res.json(persons)
+})
+
+const genId = () => {
+  // return persons.map(person => person.id).sort().reverse()[0] + 1
+  return Math.ceil(Math.random()*100000000000000000000)
+}
+
+app.post('/api/persons', (req, res) => {
+
+  if (req.body === undefined) {
+    return res.status(400).json({error: 'HTTP POST request body missing!'})
+  }
+
+  const newId = genId()
+  console.log("New ID is: ", newId)
+
+  const person = {
+    name: req.body.name,
+    number: req.body.number,
+    id: newId
+  }
+
+  console.log("Persons array before:", persons)
+  console.log("Created person:", person)
+  persons[persons.length] = person
+  console.log("Persons array after:", persons)
+  
+  res.json(person)
 })
 
 app.get('/api/persons/:id', (req, res) => {

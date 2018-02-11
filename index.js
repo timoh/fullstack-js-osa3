@@ -12,21 +12,21 @@ app.use(bodyParser.json())
 app.use(morgan('tiny'))
 app.use(cors())
 
-const Persons = require('./persons');
+const Persons = require('./persons')
 
 app.get('/api/persons', (req, res) => {
 
   Persons.getAll().then(result => {
-      res.json(result) 
+    res.json(result)
   }).then(result => {
-      mongoose.connection.close()
+    mongoose.connection.close()
   })
 })
 
 app.post('/api/persons', (req, res) => {
 
   if (req.body === undefined) {
-    return res.status(400).json({error: 'HTTP POST request body missing!'})
+    return res.status(400).json({ error: 'HTTP POST request body missing!' })
   }
 
   const newId = Persons.genId()
@@ -46,7 +46,7 @@ app.post('/api/persons', (req, res) => {
   // console.log("Created person:", person)
   // persons[persons.length] = person
   // console.log("Persons array after:", persons)
-  
+
   res.json(person)
 })
 
@@ -63,13 +63,13 @@ app.get('/api/persons/:id', (req, res) => {
         name: result[0].name,
         number: result[0].number
       }
-      res.json(formattedPerson) 
+      res.json(formattedPerson)
     } else {
       res.status(404).send('Person not found!')
     }
 
   }).then(result => {
-      mongoose.connection.close()
+    mongoose.connection.close()
   })
 })
 
@@ -79,22 +79,22 @@ app.delete('/api/persons/:id', (req, res) => {
   Persons.deletePerson(id).then(result => {
     res.status(204).end()
   })
-  .catch(error => {
-    res.status(400).send({ error: 'Bad ID' })
-  })
+    .catch(error => {
+      res.status(400).send({ error: 'Bad ID' })
+    })
 })
 
 app.get('/info', (req, res) => {
 
   Persons.getAll().then(result => {
-    
+
     const personCount = `puhelinluettelossa on ${result.length} henkilön tiedot`
-    const reqTime = new Date();
-    const respHTML = `<p>${personCount}</p> <p>${reqTime}</p>` 
+    const reqTime = new Date()
+    const respHTML = `<p>${personCount}</p> <p>${reqTime}</p>`
     res.send(respHTML)
 
   }).then(result => {
-      mongoose.connection.close()
+    mongoose.connection.close()
   })
 
 })

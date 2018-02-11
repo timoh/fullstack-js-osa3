@@ -28,6 +28,11 @@ const getAll = () => {
     return Person.find({})
 }
 
+const findOne = (personId) => {
+    mongoose.connect(url)
+    return Person.find({id: personId})
+}
+
 const addNew = (personObj) => {
     mongoose.connect(url)
 
@@ -37,8 +42,15 @@ const addNew = (personObj) => {
       })
 }
 
+const deletePerson = (personId) => {
+    mongoose.connect(url)
+    return Person.findOneAndRemove({id: personId})
+}
+
 module.exports = {
     getAll: getAll,
+    findOne: findOne,
+    deletePerson, deletePerson,
     addNew: addNew,
     genId: genId,
     Person: Person

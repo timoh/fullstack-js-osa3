@@ -29,10 +29,12 @@ app.post('/api/persons', (req, res) => {
     return res.status(400).json({error: 'HTTP POST request body missing!'})
   }
 
+  const newId = Persons.genId()
+
   const person = new Persons.Person({
     name: req.body.name,
     number: req.body.number,
-    id: Persons.genId()
+    id: newId
   })
 
   person.save().then(resp => {
@@ -50,31 +52,51 @@ app.post('/api/persons', (req, res) => {
 
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
-  const person = persons.find(person => person.id === id )
-  if (person && person.id === id) {
-    res.json(person)
-  } else {
-    res.status(404).send('Person not found!')
-  }
+
+  Persons.findOne(id).then(result => {
+    console.log(id)
+    console.log(result)
+
+    if (result[0] && result[0].id === id) {
+      const formattedPerson = {
+        id: result[0].id,
+        name: result[0].name,
+        number: result[0].number
+      }
+      res.json(formattedPerson) 
+    } else {
+      res.status(404).send('Person not found!')
+    }
+
+  }).then(result => {
+      mongoose.connection.close()
+  })
 })
 
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
-  const person = persons.find(person => person.id === id )
-  if (person && person.id === id) {
-    persons = persons.filter(person => person.id !== id);
-    res.status(204).send(`Person with id ${person.id} removed!`)
-    console.log(persons)
-  } else {
-    res.status(404).send('Person not found!')
-  }
+
+  Persons.deletePerson(id).then(result => {
+    res.status(204).end()
+  })
+  .catch(error => {
+    res.status(400).send({ error: 'Bad ID' })
+  })
 })
 
 app.get('/info', (req, res) => {
-  const personCount = `puhelinluettelossa on ${persons.length} henkilön tiedot`
-  const reqTime = new Date();
-  const respHTML = `<p>${personCount}</p> <p>${reqTime}</p>` 
-  res.send(respHTML)
+
+  Persons.getAll().then(result => {
+    
+    const personCount = `puhelinluettelossa on ${result.length} henkilön tiedot`
+    const reqTime = new Date();
+    const respHTML = `<p>${personCount}</p> <p>${reqTime}</p>` 
+    res.send(respHTML)
+
+  }).then(result => {
+      mongoose.connection.close()
+  })
+
 })
 
 const PORT = process.env.PORT || 3001

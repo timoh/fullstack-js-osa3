@@ -2,9 +2,11 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
+const cors = require('cors')
+
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
-
+app.use(cors())
 
 let persons = [
   {
@@ -19,12 +21,12 @@ let persons = [
   }, 
   {
     name: "Arto Järvinen",
-    number: "040123123",
+    number: "040123563",
     id: 3
   },
   {
     name: "Lea Kutvonen",
-    number: "040123123",
+    number: "0401242323",
     id: 4
   }
 ]

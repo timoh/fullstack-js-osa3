@@ -29,6 +29,17 @@ app.get('/api/persons', (req, res) => {
   res.json(persons)
 })
 
+app.get('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const person = persons.find(person => person.id === id )
+  if (person && person.id === id) {
+    res.json(person)
+  } else {
+    res.status(404).send('Person not found!')
+  }
+  
+})
+
 const personCount = `puhelinluettelossa on ${persons.length} henkilön tiedot`
 const reqTime = new Date();
 const respHTML = `<p>${personCount}</p> <p>${reqTime}</p>`

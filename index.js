@@ -4,29 +4,24 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
 const mongoose = require('mongoose')
-require('dotenv').config()
 
-const url = process.env.MONGODB_URI
+require('dotenv').config()
 
 app.use(express.static('build'))
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
 app.use(cors())
 
-const Person = mongoose.model('Person', {
-  name: String,
-  number: String,
-  id: Number
-})
+const Persons = require('./persons');
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
-})
 
-const genId = () => {
-  // return persons.map(person => person.id).sort().reverse()[0] + 1
-  return Math.ceil(Math.random()*100000000000000000000)
-}
+  Persons.getAll().then(result => {
+      res.json(result) 
+  }).then(result => {
+      mongoose.connection.close()
+  })
+})
 
 app.post('/api/persons', (req, res) => {
 
@@ -34,27 +29,20 @@ app.post('/api/persons', (req, res) => {
     return res.status(400).json({error: 'HTTP POST request body missing!'})
   }
 
-  const newId = genId()
-  // console.log("New ID is: ", newId)
-
-  mongoose.connect(url)
-
-  const person = new Person{
+  const person = new Persons.Person({
     name: req.body.name,
     number: req.body.number,
-    id: newId
-  }
+    id: Persons.genId()
+  })
 
   person.save().then(resp => {
     console.log(`Saved person with ID ${newId}`)
     mongoose.connection.close()
   })
 
-
-
   // console.log("Persons array before:", persons)
   // console.log("Created person:", person)
-  persons[persons.length] = person
+  // persons[persons.length] = person
   // console.log("Persons array after:", persons)
   
   res.json(person)
@@ -82,11 +70,10 @@ app.delete('/api/persons/:id', (req, res) => {
   }
 })
 
-const personCount = `puhelinluettelossa on ${persons.length} henkilön tiedot`
-const reqTime = new Date();
-const respHTML = `<p>${personCount}</p> <p>${reqTime}</p>`
-
 app.get('/info', (req, res) => {
+  const personCount = `puhelinluettelossa on ${persons.length} henkilön tiedot`
+  const reqTime = new Date();
+  const respHTML = `<p>${personCount}</p> <p>${reqTime}</p>` 
   res.send(respHTML)
 })
 

@@ -1,5 +1,16 @@
+/*  
+
+    This file handles the command line interface (CLI) of the 
+    Person model with Mongoose.
+
+    NOTE: refactored codebase to have the Person schema and 
+    Mongoose stuff in its own file 
+
+*/
+
+const Persons = require('./persons');
+
 const commandLineArgs = require('command-line-args')
-const mongoose = require('mongoose')
 require('dotenv').config()
 
 const url = process.env.MONGODB_URI
@@ -12,59 +23,24 @@ const options = commandLineArgs(optionDefinitions)
 const nameArg = options.name
 const numberArg = options.number
 
-// console.log(options)
+if (nameArg !== undefined && numberArg !== undefined) {
+    // only if both arguments are defined, go ahead and store
 
-const Person = mongoose.model('Person', {
-    name: String,
-    number: String,
-    id: Number
-  })
+    const newPerson = new Persons.Person({
+        name: nameArg,
+        number: numberArg,
+        id: Persons.genId()
+    })
 
-const genId = () => {
-    // return persons.map(person => person.id).sort().reverse()[0] + 1
-    return Math.ceil(Math.random()*100000000000000000000)
-}
-
-
-
-// console.log(newPerson)
-
-const getAll = () => {
-    mongoose.connect(url)
-
-    Person
-    .find({})
-    .then(result => {
+    Persons.addNew(newPerson)
+} else {
+    Persons.getAll().then(result => {
         console.log("puhelinluettelo: ")
 
         result.forEach(person => {
-        console.log(`${person.name} ${person.number}`)
+            console.log(`${person.name} ${person.number}`)
+        }).then(result => {
+            mongoose.connection.close()
         })
-        mongoose.connection.close()
     })
-}
-
-const addNew = (personObj) => {
-    mongoose.connect(url)
-
-    return personObj.save().then(resp => {
-        console.log(`lisätään henkilö ${personObj.name} numero ${personObj.number} luetteloon`)
-        mongoose.connection.close()
-      })
-}
-
-
-if (nameArg !== undefined && numberArg !== undefined) {
-
-    const newPerson = new Person({
-        name: nameArg,
-        number: numberArg,
-        id: genId()
-    })
-
-    // only if both arguments are defined, go ahead and store
-    addNew(newPerson)
-    
-} else {
-    getAll()
 }

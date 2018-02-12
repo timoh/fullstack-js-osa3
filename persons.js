@@ -10,11 +10,21 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 const url = process.env.MONGODB_URI
 
-const Person = mongoose.model('Person', {
+const personSchema = new mongoose.Schema({
   name: String,
   number: String,
   id: Number
 })
+
+personSchema.statics.format = (person) => {
+  return {
+    name: person.name,
+    number: person.number,
+    id: person.id
+  }
+}
+
+const Person = mongoose.model('Person', personSchema)
 
 const genId = () => {
   // return persons.map(person => person.id).sort().reverse()[0] + 1
@@ -56,7 +66,7 @@ module.exports = {
   getAll: getAll,
   findOne: findOne,
   find: find,
-  deletePerson, deletePerson,
+  deletePerson: deletePerson,
   addNew: addNew,
   genId: genId,
   Person: Person

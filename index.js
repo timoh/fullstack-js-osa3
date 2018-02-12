@@ -18,10 +18,18 @@ app.use(cors())
 
 const Persons = require('./persons')
 
+// const formatPerson = (person) => {
+//   return {
+//     name: person.name,
+//     number: person.number,
+//     id: person.id
+//   }
+// }
+
 app.get('/api/persons', (req, res) => {
 
   Persons.getAll().then(result => {
-    res.json(result)
+    res.json(result.map(Persons.Person.format))
   }).then(result => {
     mongoose.connection.close()
   })
@@ -64,7 +72,7 @@ app.post('/api/persons', (req, res) => {
         // persons[persons.length] = person
         // console.log("Persons array after:", persons)
     
-        res.json(person)
+        res.json(Persons.Person.format(person))
       }
 
       mongoose.connection.close()
@@ -81,12 +89,7 @@ app.get('/api/persons/:id', (req, res) => {
     console.log(result)
 
     if (result[0] && result[0].id === id) {
-      const formattedPerson = {
-        id: result[0].id,
-        name: result[0].name,
-        number: result[0].number
-      }
-      res.json(formattedPerson)
+      res.json(Persons.Person.format(result[0]))
     } else {
       res.status(404).send('Person not found!')
     }

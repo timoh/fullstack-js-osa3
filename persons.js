@@ -8,7 +8,15 @@
 const mongoose = require('mongoose')
 
 require('dotenv').config()
-const url = process.env.MONGODB_URI
+
+let url = ''
+
+if ( process.env.NODE_ENV !== 'production' ) {
+  url = process.env.MONGODB_URI_DEV
+} else {
+  url = process.env.MONGODB_URI_PROD
+}
+
 
 const personSchema = new mongoose.Schema({
   name: String,

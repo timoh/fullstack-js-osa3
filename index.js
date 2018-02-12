@@ -81,6 +81,44 @@ app.post('/api/persons', (req, res) => {
 
 })
 
+app.put('/api/persons/:id', (req, res) => {
+  console.log(req.body)
+
+  const newName = req.body.name
+  const newNumber = req.body.number
+  const newId = req.body.id
+
+  if (newName === undefined || newNumber === undefined || newId === undefined) {
+    res.status(400).json({ error: 'Bad request: missing name or number!' })
+  } else {
+    Persons.findOne(newId).then(result => {
+  
+      if (result[0] && result[0].id === newId) {
+
+        const newPerson = {
+          name: newName,
+          number: newNumber
+        }
+
+        Persons.Person.findByIdAndUpdate(result[0]._id, newPerson, { new: true })
+          .then(updatedPerson => {
+            res.json(Persons.Person.format(updatedPerson))
+            mongoose.connection.close()
+          }).catch(error => {
+            console.log(error)
+            res.status(400).send({ error: 'malformatted id' })
+          })
+
+      } else {
+        res.status(404).send('Person not found!')
+      }
+  
+    }).then(result => {
+      
+    })
+  }
+})
+
 app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
 

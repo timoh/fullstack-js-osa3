@@ -9,7 +9,11 @@ require('dotenv').config()
 
 app.use(express.static('build'))
 app.use(bodyParser.json())
-app.use(morgan('tiny'))
+
+// app.use(morgan('tiny'))
+morgan.token('bodyjson', function (req, res) { return JSON.stringify(req.body) })
+app.use(morgan(':method :url :bodyjson :status :res[content-length] - :response-time ms'))
+
 app.use(cors())
 
 const Persons = require('./persons')

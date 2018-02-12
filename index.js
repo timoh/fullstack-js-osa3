@@ -26,28 +26,47 @@ app.get('/api/persons', (req, res) => {
 app.post('/api/persons', (req, res) => {
 
   if (req.body === undefined) {
-    return res.status(400).json({ error: 'HTTP POST request body missing!' })
+    return res.status(400).json({ error: 'Bad request: HTTP POST request body missing!' })
   }
 
-  const newId = Persons.genId()
+  const newName = req.body.name
+  const newNumber = req.body.number
 
-  const person = new Persons.Person({
-    name: req.body.name,
-    number: req.body.number,
-    id: newId
-  })
+  if (newName === undefined || newNumber === undefined) {
 
-  person.save().then(resp => {
-    console.log(`Saved person with ID ${newId}`)
-    mongoose.connection.close()
-  })
+    res.status(400).json({ error: 'Bad request: missing name or number!' })
 
-  // console.log("Persons array before:", persons)
-  // console.log("Created person:", person)
-  // persons[persons.length] = person
-  // console.log("Persons array after:", persons)
+  } else {
 
-  res.json(person)
+    const existingPerson = Persons.find({name : newName}).then(results => {
+
+      if (results.length > 0) {
+        res.status(409).json({ error: 'Conflict: name must be unique' })
+      } else {
+        const newId = Persons.genId()
+
+        const person = new Persons.Person({
+          name: newName,
+          number: newNumber,
+          id: newId
+        })
+    
+        person.save().then(resp => {
+          console.log(`Saved person with ID ${newId}`)
+        })
+    
+        // console.log("Persons array before:", persons)
+        // console.log("Created person:", person)
+        // persons[persons.length] = person
+        // console.log("Persons array after:", persons)
+    
+        res.json(person)
+      }
+
+      mongoose.connection.close()
+    })
+  }
+
 })
 
 app.get('/api/persons/:id', (req, res) => {

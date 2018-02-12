@@ -15,32 +15,32 @@ require('dotenv').config()
 
 const url = process.env.MONGODB_URI
 const optionDefinitions = [
-    { name: 'name', type: String },
-    { name: 'number', type: String }
-  ]
+  { name: 'name', type: String },
+  { name: 'number', type: String }
+]
 const options = commandLineArgs(optionDefinitions)
 
 const nameArg = options.name
 const numberArg = options.number
 
 if (nameArg !== undefined && numberArg !== undefined) {
-    // only if both arguments are defined, go ahead and store
+  // only if both arguments are defined, go ahead and store
 
-    const newPerson = new Persons.Person({
-        name: nameArg,
-        number: numberArg,
-        id: Persons.genId()
-    })
+  const newPerson = new Persons.Person({
+    name: nameArg,
+    number: numberArg,
+    id: Persons.genId()
+  })
 
-    Persons.addNew(newPerson)
+  Persons.addNew(newPerson)
 } else {
-    Persons.getAll().then(result => {
-        console.log("puhelinluettelo: ")
+  Persons.getAll().then(result => {
+    console.log("puhelinluettelo: ")
 
-        result.forEach(person => {
-            console.log(`${person.name} ${person.number}`)
-        }).then(result => {
-            mongoose.connection.close()
-        })
+    result.forEach(person => {
+      console.log(`${person.name} ${person.number}`)
+    }).then(result => {
+      mongoose.connection.close()
     })
+  })
 }
